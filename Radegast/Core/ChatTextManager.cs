@@ -1,7 +1,7 @@
-/**
+/*
  * Radegast Metaverse Client
  * Copyright(c) 2009-2014, Radegast Development Team
- * Copyright(c) 2016-2020, Sjofn, LLC
+ * Copyright(c) 2016-2023, Sjofn, LLC
  * All rights reserved.
  *  
  * Radegast is free software: you can redistribute it and/or modify
@@ -54,16 +54,16 @@ namespace Radegast
             InitializeConfig();
 
             // Callbacks
-            netcom.ChatReceived += new EventHandler<ChatEventArgs>(netcom_ChatReceived);
-            netcom.ChatSent += new EventHandler<ChatSentEventArgs>(netcom_ChatSent);
-            netcom.AlertMessageReceived += new EventHandler<AlertMessageEventArgs>(netcom_AlertMessageReceived);
+            netcom.ChatReceived += netcom_ChatReceived;
+            netcom.ChatSent += netcom_ChatSent;
+            netcom.AlertMessageReceived += netcom_AlertMessageReceived;
         }
 
         public void Dispose()
         {
-            netcom.ChatReceived -= new EventHandler<ChatEventArgs>(netcom_ChatReceived);
-            netcom.ChatSent -= new EventHandler<ChatSentEventArgs>(netcom_ChatSent);
-            netcom.AlertMessageReceived -= new EventHandler<AlertMessageEventArgs>(netcom_AlertMessageReceived);
+            netcom.ChatReceived -= netcom_ChatReceived;
+            netcom.ChatSent -= netcom_ChatSent;
+            netcom.AlertMessageReceived -= netcom_AlertMessageReceived;
         }
 
         private void InitializeConfig()
@@ -97,7 +97,7 @@ namespace Radegast
 
             showTimestamps = s["chat_timestamps"].AsBoolean();
 
-            s.OnSettingChanged += new Settings.SettingChangedCallback(s_OnSettingChanged);
+            s.OnSettingChanged += s_OnSettingChanged;
         }
 
         void s_OnSettingChanged(object sender, SettingsEventArgs e)
@@ -107,7 +107,7 @@ namespace Radegast
                 showTimestamps = e.Value.AsBoolean();
                 ReprintAllText();
             }
-            else if(e.Key == "chat_fonts")
+            else if (e.Key == "chat_fonts")
             {
                 try
                 {
@@ -148,7 +148,7 @@ namespace Radegast
             ChatBufferItem title = new ChatBufferItem(
                 DateTime.Now, "",
                 UUID.Zero,
-                Properties.Resources.RadegastTitle + " " + Assembly.GetExecutingAssembly().GetName().Version, 
+                Properties.Resources.RadegastTitle + " " + Assembly.GetExecutingAssembly().GetName().Version,
                 ChatBufferTextStyle.StartupTitle);
 
             ChatBufferItem ready = new ChatBufferItem(
@@ -171,7 +171,7 @@ namespace Radegast
 
                 if (showTimestamps)
                 {
-                    if(fontSettings.ContainsKey("Timestamp"))
+                    if (fontSettings.ContainsKey("Timestamp"))
                     {
                         var fontSetting = fontSettings["Timestamp"];
                         TextPrinter.ForeColor = fontSetting.ForeColor;
@@ -188,7 +188,7 @@ namespace Radegast
                     }
                 }
 
-                if(fontSettings.ContainsKey("Name"))
+                if (fontSettings.ContainsKey("Name"))
                 {
                     var fontSetting = fontSettings["Name"];
                     TextPrinter.ForeColor = fontSetting.ForeColor;
@@ -211,7 +211,7 @@ namespace Radegast
                     TextPrinter.PrintText(item.From);
                 }
 
-                if(fontSettings.ContainsKey(item.Style.ToString()))
+                if (fontSettings.ContainsKey(item.Style.ToString()))
                 {
                     var fontSetting = fontSettings[item.Style.ToString()];
                     TextPrinter.ForeColor = fontSetting.ForeColor;
@@ -264,7 +264,7 @@ namespace Radegast
 
             // Check if the sender agent is muted
             if (e.SourceType == ChatSourceType.Agent
-                && client.Self.MuteList.Find(me => me.Type == MuteType.Resident 
+                && client.Self.MuteList.Find(me => me.Type == MuteType.Resident
                                                    && me.ID == e.SourceID) != null)
             {
                 return;
@@ -287,7 +287,7 @@ namespace Radegast
                 return;
             }
 
-            if (instance.RLV.Enabled 
+            if (instance.RLV.Enabled
                 && e.Type == ChatType.OwnerSay
                 && e.Message.StartsWith("@"))
             {
@@ -299,14 +299,14 @@ namespace Radegast
 #endif
             }
 
-            ChatBufferItem item = new ChatBufferItem {ID = e.SourceID, RawMessage = e};
+            ChatBufferItem item = new ChatBufferItem { ID = e.SourceID, RawMessage = e };
             StringBuilder sb = new StringBuilder();
 
-            item.From = e.SourceType == ChatSourceType.Agent 
-                ? instance.Names.Get(e.SourceID, e.FromName) 
+            item.From = e.SourceType == ChatSourceType.Agent
+                ? instance.Names.Get(e.SourceID, e.FromName)
                 : e.FromName;
 
-            bool isEmote = e.Message.ToLower().StartsWith("/me ");
+            bool isEmote = e.Message.StartsWith("/me ", StringComparison.OrdinalIgnoreCase);
 
             if (!isEmote)
             {
@@ -325,18 +325,28 @@ namespace Radegast
 
             if (isEmote)
             {
-                if (e.SourceType == ChatSourceType.Agent && instance.RLV.RestictionActive("recvemote", e.SourceID.ToString()))
+                if (e.SourceType == ChatSourceType.Agent &&
+                    instance.RLV.RestictionActive("recvemote", e.SourceID.ToString()))
+                {
                     sb.Append(" ...");
+                }
                 else
+                {
                     sb.Append(e.Message.Substring(3));
+                }
             }
             else
             {
                 sb.Append(": ");
-                if (e.SourceType == ChatSourceType.Agent && !e.Message.StartsWith("/") && instance.RLV.RestictionActive("recvchat", e.SourceID.ToString()))
+                if (e.SourceType == ChatSourceType.Agent && !e.Message.StartsWith("/") &&
+                    instance.RLV.RestictionActive("recvchat", e.SourceID.ToString()))
+                {
                     sb.Append("...");
+                }
                 else
+                {
                     sb.Append(e.Message);
+                }
             }
 
             item.Timestamp = DateTime.Now;
@@ -345,15 +355,15 @@ namespace Radegast
             switch (e.SourceType)
             {
                 case ChatSourceType.Agent:
-                    if(e.FromName.EndsWith("Linden"))
+                    if (e.FromName.EndsWith("Linden"))
                     {
                         item.Style = ChatBufferTextStyle.LindenChat;
                     }
-                    else if(isEmote)
+                    else if (isEmote)
                     {
                         item.Style = ChatBufferTextStyle.Emote;
                     }
-                    else if(e.SourceID == client.Self.AgentID)
+                    else if (e.SourceID == client.Self.AgentID)
                     {
                         item.Style = ChatBufferTextStyle.Self;
                     }
@@ -363,24 +373,20 @@ namespace Radegast
                     }
                     break;
                 case ChatSourceType.Object:
-                    if (e.Type == ChatType.OwnerSay)
+                    switch (e.Type)
                     {
-                        if(isEmote)
-                        {
+                        case ChatType.OwnerSay when isEmote:
                             item.Style = ChatBufferTextStyle.Emote;
-                        }
-                        else
-                        {
+                            break;
+                        case ChatType.OwnerSay:
                             item.Style = ChatBufferTextStyle.OwnerSay;
-                        }
-                    }
-                    else if (e.Type == ChatType.Debug)
-                    {
-                        item.Style = ChatBufferTextStyle.Error;
-                    }
-                    else
-                    {
-                        item.Style = ChatBufferTextStyle.ObjectChat;
+                            break;
+                        case ChatType.Debug:
+                            item.Style = ChatBufferTextStyle.Error;
+                            break;
+                        default:
+                            item.Style = ChatBufferTextStyle.ObjectChat;
+                            break;
                     }
                     break;
             }

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
 	<UseWindowsForms>true</UseWindowsForms>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	<Platforms>AnyCPU;x64;x86</Platforms>
@@ -56,8 +56,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AIMLbot-Radegast" Version="2.5.1.1" />
-    <PackageReference Include="log4net" Version="2.0.14" />
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
+    <PackageReference Include="log4net" Version="2.0.15" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="aiml\AI.aiml">
