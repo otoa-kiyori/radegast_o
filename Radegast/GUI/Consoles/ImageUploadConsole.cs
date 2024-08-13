@@ -20,11 +20,19 @@
 
 using System;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Windows.Forms;
 using System.IO;
+using System.Runtime.InteropServices;
+using CSJ2K;
+using CSJ2K.j2k.util;
 using OpenMetaverse;
 using OpenMetaverse.Imaging;
+using OpenTK.Graphics.OpenGL;
+using Pfim;
+using SkiaSharp;
+using SkiaSharp.Views.Desktop;
+using ImageFormat = System.Drawing.Imaging.ImageFormat;
+using PixelFormat = System.Drawing.Imaging.PixelFormat;
 
 namespace Radegast
 {
@@ -145,19 +153,22 @@ namespace Radegast
                     case ".j2c":
                         // Upload JPEG2000 images untouched
                         UploadData = File.ReadAllBytes(FileName);
-
-                        using (var reader = new OpenJpegDotNet.IO.Reader(UploadData))
-                        {
-                            if (reader.ReadHeader())
-                            {
-                                bitmap = reader.DecodeToBitmap();
-                            }
-                        }
+                        bitmap = J2kImage.FromBytes(UploadData).As<SKBitmap>().ToBitmap();
 
                         txtStatus.AppendText("Loaded raw JPEG2000 data " + FileName + Environment.NewLine);
                         break;
                     case ".tga":
-                        bitmap = LoadTGAClass.LoadTGA(FileName);
+                        var tga = Pfimage.FromFile(FileName);
+                        var handle = GCHandle.Alloc(tga.Data, GCHandleType.Pinned);
+                        try
+                        {
+                            var data = Marshal.UnsafeAddrOfPinnedArrayElement(tga.Data, 0);
+                            bitmap = new Bitmap(tga.Width, tga.Height, tga.Stride, PixelFormat.Format32bppArgb, data);
+                        }
+                        finally
+                        {
+                            handle.Free();
+                        }
                         break;
                     default:
                         bitmap = Image.FromFile(FileName) as Bitmap;
@@ -202,27 +213,22 @@ namespace Radegast
 
                 txtStatus.AppendText("Encoding image..." + Environment.NewLine);
 
-                using (var writer = new OpenJpegDotNet.IO.Writer(bitmap))
-                {
-                    var cp = new OpenJpegDotNet.CompressionParameters();
-                    OpenJpegDotNet.OpenJpeg.SetDefaultEncoderParameters(cp);
-                    cp.CodingParameterDistortionAllocation = 1;
-                    if (chkLossless.Checked) {
-                        cp.TcpNumLayers = 1;
-                        cp.TcpRates[0] = 0;
-                    } else {
-                        cp.TcpNumLayers = 5;
-                        cp.TcpRates[0] = 1920;
-                        cp.TcpRates[1] = 480;
-                        cp.TcpRates[2] = 120;
-                        cp.TcpRates[3] = 30;
-                        cp.TcpRates[4] = 10;
-                        cp.Irreversible = true;
-                        cp.TcpMCT = 1;
-                    }
-                    writer.SetupEncoderParameters(cp);
-                    UploadData = writer.Encode();
-                }
+                // FIXME: 
+                /*if (chkLossless.Checked) {
+                    cp.TcpNumLayers = 1;
+                    cp.TcpRates[0] = 0;
+                } else {
+                    cp.TcpNumLayers = 5;
+                    cp.TcpRates[0] = 1920;
+                    cp.TcpRates[1] = 480;
+                    cp.TcpRates[2] = 120;
+                    cp.TcpRates[3] = 30;
+                    cp.TcpRates[4] = 10;
+                    cp.Irreversible = true;
+                    cp.TcpMCT = 1;
+                }*/
+                
+                UploadData = J2kImage.ToBytes(bitmap.ToSKBitmap());
 
                 txtStatus.AppendText("Finished encoding." + Environment.NewLine);
                 ImageLoaded = true;
@@ -230,7 +236,8 @@ namespace Radegast
                 txtAssetID.Text = UUID.Zero.ToString();
 
                 pbPreview.Image = bitmap;
-                lblSize.Text = string.Format("{0}x{1} {2} KB", bitmap.Width, bitmap.Height, Math.Round((double)UploadData.Length / 1024.0d, 2));
+                lblSize.Text =
+                    $"{bitmap.Width}x{bitmap.Height} {Math.Round((double)UploadData.Length / 1024.0d, 2)} KB";
             }
             catch (Exception ex)
             {
@@ -289,13 +296,8 @@ namespace Radegast
                 }
                 else if (type == 2)
                 { // targa
-                    using (var reader = new OpenJpegDotNet.IO.Reader(UploadData))
-                    {
-                        if (reader.ReadHeader())
-                        {
-                            File.WriteAllBytes(dlg.FileName, reader.Decode().ToTarga().Bytes);
-                        }
-                    }
+                    var mgimg = new ManagedImage(J2kImage.FromBytes(UploadData));
+                    File.WriteAllBytes(dlg.FileName, OpenMetaverse.Imaging.Targa.Encode(mgimg));
                 }
                 else if (type == 1)
                 { // png

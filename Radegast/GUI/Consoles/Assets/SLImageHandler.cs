@@ -25,6 +25,9 @@ using System.Windows.Forms;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
 using System.IO;
+using CSJ2K;
+using SkiaSharp;
+using SkiaSharp.Views.Desktop;
 
 namespace Radegast
 {
@@ -177,18 +180,8 @@ namespace Radegast
 
             try
             {
-                using (var reader = new OpenJpegDotNet.IO.Reader(assetTexture.AssetData))
-                {
-                    if (reader.ReadHeader())
-                    {
-                        pictureBox1.Image = reader.DecodeToBitmap();
-                        pictureBox1.Enabled = true;
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to read J2K header");
-                    }
-                }
+                pictureBox1.Image = J2kImage.FromBytes(assetTexture.AssetData).As<SKBitmap>().ToBitmap();
+                pictureBox1.Enabled = true;
             }
             catch (Exception e) {
                 Hide();
@@ -215,18 +208,7 @@ namespace Radegast
                 progressBar1.Hide();
                 lblProgress.Hide();
 
-                using (var reader = new OpenJpegDotNet.IO.Reader(assetTexture.AssetData))
-                {
-                    if (reader.ReadHeader())
-                    {
-                        image = reader.DecodeToBitmap();
-                    } 
-                    else
-                    {
-                        throw new Exception("Failed to read J2K header");
-                    }
-                }
-
+                image = J2kImage.FromBytes(assetTexture.AssetData).As<SKBitmap>().ToBitmap();
                 Text = Text; // yeah, really ;)
 
                 pictureBox1.Image = image;
@@ -275,8 +257,9 @@ namespace Radegast
                 }
                 else if (type == 1)
                 { // targa
-                    var mi = new OpenMetaverse.Imaging.ManagedImage((Bitmap)image);
-                    File.WriteAllBytes(dlg.FileName, mi.ExportTGA());
+                    var bmp = (Bitmap)image;
+                    var mi = new OpenMetaverse.Imaging.ManagedImage(bmp.ToSKBitmap());
+                    File.WriteAllBytes(dlg.FileName, OpenMetaverse.Imaging.Targa.Encode(mi));
                 }
                 else if (type == 3)
                 { // png

@@ -28,8 +28,11 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using CSJ2K;
 using OpenMetaverse.Assets;
 using OpenMetaverse;
+using SkiaSharp;
+using SkiaSharp.Views.Desktop;
 
 namespace Radegast.WinForms
 {
@@ -203,11 +206,7 @@ namespace Radegast.WinForms
                     {
                         if (state == TextureRequestState.Finished)
                         {
-                            using (var reader = new OpenJpegDotNet.IO.Reader(asset.AssetData))
-                            {
-                                if (!reader.ReadHeader()) { return; }
-                                _MapLayer = reader.DecodeToBitmap();
-                            }
+                            _MapLayer = J2kImage.FromBytes(asset.AssetData).As<SKBitmap>().ToBitmap();
                         }
                     });
             }

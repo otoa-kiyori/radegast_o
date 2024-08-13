@@ -11871,7 +11871,7 @@ namespace Radegast.LSL
         public static object StateChange_2_factory(Parser yyp) { return new StateChange_2(yyp); }
         public static object Declaration_factory(Parser yyp) { return new Declaration(yyp); }
         public static object IdentExpression_factory(Parser yyp) { return new IdentExpression(yyp); }
-        public static object error_factory(Parser yyp) { return new error(yyp); }
+        public static object error_factory(Parser yyp) { return new Error(yyp); }
         public static object BinaryExpression_2_factory(Parser yyp) { return new BinaryExpression_2(yyp); }
         public static object BinaryExpression_3_factory(Parser yyp) { return new BinaryExpression_3(yyp); }
         public static object BinaryExpression_4_factory(Parser yyp) { return new BinaryExpression_4(yyp); }

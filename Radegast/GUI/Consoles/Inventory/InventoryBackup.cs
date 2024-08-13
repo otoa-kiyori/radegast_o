@@ -324,8 +324,8 @@ namespace Radegast
 
                                         case AssetType.Texture:
                                             AssetTexture imgAsset = (AssetTexture)receivedAsset;
-                                            var img = LoadTGAClass.LoadTGA(new MemoryStream(imgAsset.Image.ExportTGA()));
-                                            img.Save(fullName, System.Drawing.Imaging.ImageFormat.Png);
+                                            var img = Targa.Encode(imgAsset.Image);
+                                            File.WriteAllBytes(fullName, img);
                                             if (dateOK)
                                             {
                                                 File.SetCreationTimeUtc(fullName, item.CreationDate);
@@ -339,7 +339,7 @@ namespace Radegast
                                     {
                                         fileName.Text = fullName;
                                         status.Text = "Saved";
-                                        lblStatus.Text = string.Format("Saved {0} items", ++fetched);
+                                        lblStatus.Text = $"Saved {++fetched} items";
                                     }));
 
                                 }

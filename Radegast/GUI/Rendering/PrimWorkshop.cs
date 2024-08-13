@@ -37,9 +37,12 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Threading;
+using CSJ2K;
 using OpenTK.Graphics.OpenGL;
 using OpenMetaverse;
 using OpenMetaverse.Rendering;
+using SkiaSharp;
+using SkiaSharp.Views.Desktop;
 
 #endregion Usings
 
@@ -530,17 +533,10 @@ namespace Radegast.Rendering
 
                 if (LoadTexture(item.TeFace.TextureID, ref item.Data.TextureInfo.Texture, false))
                 {
-                    Bitmap bitmap = (Bitmap)item.Data.TextureInfo.Texture;
+                    Bitmap bitmap = item.Data.TextureInfo.Texture.ToBitmap();
 
                     bool hasAlpha;
-                    if (item.Data.TextureInfo.Texture.PixelFormat == System.Drawing.Imaging.PixelFormat.Format32bppArgb)
-                    {
-                        hasAlpha = true;
-                    }
-                    else
-                    {
-                        hasAlpha = false;
-                    }
+                    hasAlpha = bitmap.PixelFormat == System.Drawing.Imaging.PixelFormat.Format32bppArgb;
                     
                     item.Data.TextureInfo.HasAlpha = hasAlpha;
 
@@ -908,10 +904,10 @@ namespace Radegast.Rendering
                 {
                     if (prim.Sculpt.Type != SculptType.Mesh)
                     { // Regular sculptie
-                        Image img = null;
+                        SKBitmap img = null;
                         if (!LoadTexture(prim.Sculpt.SculptTexture, ref img, true))
                             return;
-                        mesh = renderer.GenerateFacetedSculptMesh(prim, (Bitmap)img, DetailLevel.Highest);
+                        mesh = renderer.GenerateFacetedSculptMesh(prim, img, DetailLevel.Highest);
                     }
                     else
                     { // Mesh
@@ -1019,12 +1015,12 @@ namespace Radegast.Rendering
             SafeInvalidate();
         }
 
-        private bool LoadTexture(UUID textureID, ref Image texture, bool removeAlpha)
+        private bool LoadTexture(UUID textureID, ref SKBitmap texture, bool removeAlpha)
         {
             if (textureID == UUID.Zero) return false;
 
             ManualResetEvent gotImage = new ManualResetEvent(false);
-            Image img = null;
+            SKBitmap img = null;
 
             try
             {
@@ -1035,23 +1031,7 @@ namespace Radegast.Rendering
                         {
                             if (state == TextureRequestState.Finished)
                             {
-                                // what the fk is going on here? lol
-                                using (var reader = new OpenJpegDotNet.IO.Reader(assetTexture.AssetData))
-                                {
-                                    if (!reader.ReadHeader())
-                                    {
-                                        throw new Exception("Failed to decode texture header " + assetTexture.AssetID.ToString());
-                                    }
-
-                                    try
-                                    {
-                                        img = reader.Decode().ToBitmap(!removeAlpha);
-                                    }
-                                    catch (NotSupportedException)
-                                    {
-                                        img = null;
-                                    }
-                                }    
+                                img = J2kImage.FromBytes(assetTexture.AssetData).As<SKBitmap>();
                             }
                         }
                         finally

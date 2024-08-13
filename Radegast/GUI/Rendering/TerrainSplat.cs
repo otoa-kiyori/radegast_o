@@ -23,7 +23,10 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Threading;
+using CSJ2K;
 using OpenMetaverse;
+using SkiaSharp;
+using SkiaSharp.Views.Desktop;
 
 namespace Radegast.Rendering
 {
@@ -297,17 +300,7 @@ namespace Radegast.Rendering
             {
                 if (state == TextureRequestState.Finished && assetTexture?.AssetData != null)
                 {
-                    using (var reader = new OpenJpegDotNet.IO.Reader(assetTexture.AssetData))
-                    {
-                        if (reader.ReadHeader())
-                        {
-                            detailTexture[i] = reader.DecodeToBitmap();
-                        }
-                        else
-                        {
-                            throw new Exception("Cannot read J2K header");
-                        }
-                    }
+                    detailTexture[i] = J2kImage.FromBytes(assetTexture.AssetData).As<SKBitmap>().ToBitmap();
                 }
                 textureDone.Set();
             };

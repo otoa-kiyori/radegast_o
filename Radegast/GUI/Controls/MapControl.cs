@@ -26,8 +26,11 @@ using System.Windows.Forms;
 using System.Net;
 using System.IO;
 using System.Threading;
+using CSJ2K;
 using OpenMetaverse;
 using OpenMetaverse.Http;
+using SkiaSharp;
+using SkiaSharp.Views.Desktop;
 
 namespace Radegast
 {
@@ -301,19 +304,9 @@ namespace Radegast
             {
                 if (Client.Assets.Cache.HasAsset(imageID))
                 {
-                    using (var reader = new OpenJpegDotNet.IO.Reader(
-                        Client.Assets.Cache.GetCachedAssetBytes(imageID)))
-                    {
-                        if (reader.ReadHeader())
-                        {
-                            regionTiles[handle] = reader.DecodeToBitmap();
-                            needRepaint = true;
-                        }
-                        else
-                        {
-                            throw new Exception("Cannot read J2K header");
-                        }
-                    }
+                    regionTiles[handle] = J2kImage.FromBytes(
+                            Client.Assets.Cache.GetCachedAssetBytes(imageID)).As<SKBitmap>().ToBitmap();
+                    needRepaint = true;
 
                     lock (tileRequests)
                     {
@@ -330,19 +323,9 @@ namespace Radegast
                         {
                             if (error == null && responseData != null)
                             {
-                                using (var reader = new OpenJpegDotNet.IO.Reader(responseData))
-                                {
-                                    if (reader.ReadHeader())
-                                    {
-                                        regionTiles[handle] = reader.DecodeToBitmap();
-                                        needRepaint = true;
-                                        Client.Assets.Cache.SaveAssetToCache(imageID, responseData);
-                                    }
-                                    else
-                                    {
-                                        throw new Exception("Cannot read J2K header");
-                                    }
-                                }
+                                regionTiles[handle] = J2kImage.FromBytes(responseData).As<SKBitmap>().ToBitmap();
+                                needRepaint = true;
+                                Client.Assets.Cache.SaveAssetToCache(imageID, responseData);
                             }
 
                             lock (tileRequests)
@@ -369,18 +352,9 @@ namespace Radegast
                         case TextureRequestState.Finished:
                             if (assetTexture?.AssetData != null)
                             {
-                                using (var reader = new OpenJpegDotNet.IO.Reader(assetTexture.AssetData))
-                                {
-                                    if (reader.ReadHeader())
-                                    {
-                                        regionTiles[handle] = reader.DecodeToBitmap();
-                                        needRepaint = true;
-                                    }
-                                    else
-                                    {
-                                        throw new Exception("Cannot read J2K header");
-                                    }
-                                }
+                                regionTiles[handle] =
+                                    J2kImage.FromBytes(assetTexture.AssetData).As<SKBitmap>().ToBitmap();
+                                needRepaint = true;
                             }
                             lock (tileRequests)
                                 if (tileRequests.Contains(handle))
