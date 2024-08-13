@@ -212,23 +212,13 @@ namespace Radegast
                 }
 
                 txtStatus.AppendText("Encoding image..." + Environment.NewLine);
-
-                // FIXME: 
-                /*if (chkLossless.Checked) {
-                    cp.TcpNumLayers = 1;
-                    cp.TcpRates[0] = 0;
-                } else {
-                    cp.TcpNumLayers = 5;
-                    cp.TcpRates[0] = 1920;
-                    cp.TcpRates[1] = 480;
-                    cp.TcpRates[2] = 120;
-                    cp.TcpRates[3] = 30;
-                    cp.TcpRates[4] = 10;
-                    cp.Irreversible = true;
-                    cp.TcpMCT = 1;
-                }*/
                 
-                UploadData = J2kImage.ToBytes(bitmap.ToSKBitmap());
+                var plist = new ParameterList();
+                if (chkLossless.Checked)
+                {
+                    plist.Add("lossless", "on");
+                }
+                UploadData = J2kImage.ToBytes(bitmap.ToSKBitmap(), plist);
 
                 txtStatus.AppendText("Finished encoding." + Environment.NewLine);
                 ImageLoaded = true;
