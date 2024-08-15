@@ -218,6 +218,10 @@ namespace Radegast
                 {
                     plist.Add("lossless", "on");
                 }
+                else
+                {
+                    plist.Add("Mct", "on");
+                }
                 UploadData = J2kImage.ToBytes(bitmap.ToSKBitmap(), plist);
 
                 txtStatus.AppendText("Finished encoding." + Environment.NewLine);
