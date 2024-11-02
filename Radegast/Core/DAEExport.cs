@@ -25,7 +25,7 @@ using System.Xml;
 using System.IO;
 using System.Drawing;
 using System.Threading;
-using CSJ2K;
+using CoreJ2K;
 using OpenMetaverse;
 using OpenMetaverse.Rendering;
 using SkiaSharp;

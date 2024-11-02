@@ -25,7 +25,7 @@ using System.Windows.Forms;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
 using System.IO;
-using CSJ2K;
+using CoreJ2K;
 using SkiaSharp;
 using SkiaSharp.Views.Desktop;
 

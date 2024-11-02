@@ -28,7 +28,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using CSJ2K;
+using CoreJ2K;
 using OpenMetaverse.Assets;
 using OpenMetaverse;
 using SkiaSharp;

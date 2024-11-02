@@ -23,11 +23,9 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
 using System.Runtime.InteropServices;
-using CSJ2K;
-using CSJ2K.j2k.util;
+using CoreJ2K;
 using OpenMetaverse;
 using OpenMetaverse.Imaging;
-using OpenTK.Graphics.OpenGL;
 using Pfim;
 using SkiaSharp;
 using SkiaSharp.Views.Desktop;
@@ -212,16 +210,9 @@ namespace Radegast
                 }
 
                 txtStatus.AppendText("Encoding image..." + Environment.NewLine);
-                
-                var plist = new ParameterList();
-                if (chkLossless.Checked)
-                {
-                    plist.Add("lossless", "on");
-                }
-                else
-                {
-                    plist.Add("Mct", "on");
-                }
+
+                var plist = J2K.GetDefaultEncoderParameterList();
+                plist.Add(chkLossless.Checked ? "lossless" : "Mct", "on");
                 UploadData = J2kImage.ToBytes(bitmap.ToSKBitmap(), plist);
 
                 txtStatus.AppendText("Finished encoding." + Environment.NewLine);

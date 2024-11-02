@@ -26,9 +26,8 @@ using System.Windows.Forms;
 using System.Net;
 using System.IO;
 using System.Threading;
-using CSJ2K;
+using CoreJ2K;
 using OpenMetaverse;
-using OpenMetaverse.Http;
 using SkiaSharp;
 using SkiaSharp.Views.Desktop;
 
