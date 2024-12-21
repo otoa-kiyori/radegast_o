@@ -19,7 +19,7 @@ namespace Radegast.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -624,6 +624,16 @@ namespace Radegast.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap inv_item_material {
+            get {
+                object obj = ResourceManager.GetObject("inv_item_material", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap inv_item_notecard {
             get {
                 object obj = ResourceManager.GetObject("inv_item_notecard", resourceCulture);
@@ -687,6 +697,46 @@ namespace Radegast.Properties {
         internal static System.Drawing.Bitmap inv_item_script_dangerous {
             get {
                 object obj = ResourceManager.GetObject("inv_item_script_dangerous", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap inv_item_settings {
+            get {
+                object obj = ResourceManager.GetObject("inv_item_settings", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap inv_item_settings_day {
+            get {
+                object obj = ResourceManager.GetObject("inv_item_settings_day", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap inv_item_settings_sky {
+            get {
+                object obj = ResourceManager.GetObject("inv_item_settings_sky", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap inv_item_settings_water {
+            get {
+                object obj = ResourceManager.GetObject("inv_item_settings_water", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
