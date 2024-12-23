@@ -1,7 +1,7 @@
 /*
  * Radegast Metaverse Client
  * Copyright(c) 2009-2014, Radegast Development Team
- * Copyright(c) 2016-2021, Sjofn, LLC
+ * Copyright(c) 2016-2024, Sjofn, LLC
  * All rights reserved.
  *  
  * Radegast is free software: you can redistribute it and/or modify
@@ -86,30 +86,23 @@ namespace Radegast
             invTree.ImageList = frmMain.ResourceImages;
             invRootNode = AddDir(null, Inventory.RootFolder);
             UpdateStatus("Reading cache");
-            Init1();
-
-            GUI.GuiHelpers.ApplyGuiFixes(this);
-        }
-
-        public void Init1()
-        {
             ThreadPool.QueueUserWorkItem(sync =>
             {
                 Logger.Log($"Reading inventory cache from {instance.InventoryCacheFileName}", Helpers.LogLevel.Debug, Client);
                 Inventory.RestoreFromDisk(instance.InventoryCacheFileName);
-                Init2();
+                Init();
             });
+
+            GUI.GuiHelpers.ApplyGuiFixes(this);
         }
 
-        public void Init2()
+        public void Init()
         {
             if (instance.MainForm.InvokeRequired)
             {
-                instance.MainForm.BeginInvoke(new MethodInvoker(Init2));
+                instance.MainForm.BeginInvoke(new MethodInvoker(Init));
                 return;
             }
-
-            AddFolderFromStore(invRootNode, Inventory.RootFolder);
 
             sorter = new InvNodeSorter();
 
@@ -510,10 +503,18 @@ namespace Radegast
             dirNode.SelectedImageIndex = dirNode.ImageIndex;
             if (parentNode == null)
             {
+                if (invTree.Nodes.ContainsKey(f.UUID.ToString()))
+                {
+                    invTree.Nodes.RemoveByKey(f.UUID.ToString());
+                }
                 invTree.Nodes.Add(dirNode);
             }
             else
             {
+                if (parentNode.Nodes.ContainsKey(f.UUID.ToString()))
+                {
+                    parentNode.Nodes.RemoveByKey(f.UUID.ToString());
+                }
                 parentNode.Nodes.Add(dirNode);
             }
             lock (UUID2NodeCache)
@@ -913,7 +914,7 @@ namespace Radegast
                 }
             }
 
-            UpdateStatus("Loading... " + UUID2NodeCache.Count + " items");
+            UpdateStatus($"Loading... {UUID2NodeCache.Count} items");
         }
 
         #endregion
