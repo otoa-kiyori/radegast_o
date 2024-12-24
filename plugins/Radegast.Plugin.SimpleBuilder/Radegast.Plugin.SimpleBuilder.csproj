@@ -58,7 +58,7 @@
     <PackageReference Include="LibreMetaverse" Version="2.1.4.744" />
     <PackageReference Include="LibreMetaverse.StructuredData" Version="2.1.4.744" />
     <PackageReference Include="LibreMetaverse.Types" Version="2.1.4.744" />
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.10" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="SimpleBuilder.Designer.cs">
