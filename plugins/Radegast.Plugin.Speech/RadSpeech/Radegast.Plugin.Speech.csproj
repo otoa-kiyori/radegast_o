@@ -55,10 +55,10 @@
     <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="LibreMetaverse" Version="2.1.3.735" />
-    <PackageReference Include="LibreMetaverse.StructuredData" Version="2.1.3.735" />
-    <PackageReference Include="LibreMetaverse.Types" Version="2.1.3.735" />
-    <PackageReference Include="LibreMetaverse.Voice" Version="2.1.3.735" />
+    <PackageReference Include="LibreMetaverse" Version="2.1.4.744" />
+    <PackageReference Include="LibreMetaverse.StructuredData" Version="2.1.4.744" />
+    <PackageReference Include="LibreMetaverse.Types" Version="2.1.4.744" />
+    <PackageReference Include="LibreMetaverse.Voice.Vivox" Version="2.1.4.744" />
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.10" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Speech" Version="8.0.0" />
