@@ -1,0 +1,4 @@
+[submodule "libremetaverse"]
+	path = libremetaverse
+	url = ../libremetaverse
+	branch = master
