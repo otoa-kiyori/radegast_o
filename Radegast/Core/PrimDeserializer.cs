@@ -62,7 +62,10 @@ namespace Radegast
                         MessageBox.Show(mainWindow, excp.Message, "Saving failed", MessageBoxButtons.OK,
                             MessageBoxIcon.Error);
                     }
-                }) {IsBackground = true};
+                }) {
+                    IsBackground = true,
+                    Name = $"Deserialize {dlg.FileName}"
+                };
 
                 t.Start();
 

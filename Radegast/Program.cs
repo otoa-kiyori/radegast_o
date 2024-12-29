@@ -25,6 +25,7 @@ using System.Reflection;
 using CommandLine;
 using CommandLine.Text;
 using System.Threading;
+using CoreJ2K.Util;
 
 namespace Radegast
 {
@@ -91,6 +92,8 @@ namespace Radegast
                 if (iocpThreads < 1000) iocpThreads = 1000;
                 ThreadPool.SetMaxThreads(workerThreads, iocpThreads);
             }
+
+            SKBitmapImageCreator.Register();
 
             // Change current working directory to Radegast install dir
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) 

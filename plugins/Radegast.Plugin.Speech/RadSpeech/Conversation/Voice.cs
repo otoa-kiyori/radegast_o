@@ -20,7 +20,7 @@
 
 using System;
 using Radegast;
-using LibreMetaverse.Voice;
+using LibreMetaverse.Voice.Vivox;
 
 namespace RadegastSpeech.Conversation
 {

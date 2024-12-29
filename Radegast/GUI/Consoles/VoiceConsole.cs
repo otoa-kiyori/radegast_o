@@ -25,7 +25,7 @@ using System.Windows.Forms;
 using Radegast;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using LibreMetaverse.Voice;
+using LibreMetaverse.Voice.Vivox;
 
 namespace Radegast
 {

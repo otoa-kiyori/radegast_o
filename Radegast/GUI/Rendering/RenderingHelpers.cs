@@ -29,6 +29,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using OpenMetaverse;
 using OpenMetaverse.Rendering;
+using SkiaSharp;
 
 namespace Radegast.Rendering
 {
@@ -53,7 +54,7 @@ namespace Radegast.Rendering
 
     public class TextureInfo
     {
-        public Image Texture;
+        public SKBitmap Texture;
         public int TexturePointer;
         public bool HasAlpha;
         public bool FullAlpha;

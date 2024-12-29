@@ -40,12 +40,17 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Threading;
+using CoreJ2K;
 using OpenTK.Graphics.OpenGL;
 using OpenMetaverse;
 using OpenMetaverse.Rendering;
 using OpenMetaverse.Assets;
 using OpenMetaverse.Imaging;
 using OpenMetaverse.Packets;
+using SkiaSharp;
+using SkiaSharp.Views.Desktop;
+using MemoryStream = System.IO.MemoryStream;
+
 #endregion Usings
 
 namespace Radegast.Rendering
@@ -136,7 +141,7 @@ namespace Radegast.Rendering
 
         Font HoverTextFont = new Font(FontFamily.GenericSansSerif, 9f, FontStyle.Regular);
         Font AvatarTagFont = new Font(FontFamily.GenericSansSerif, 10f, FontStyle.Bold);
-        Dictionary<UUID, Bitmap> sculptCache = new Dictionary<UUID, Bitmap>();
+        Dictionary<UUID, SKBitmap> sculptCache = new Dictionary<UUID, SKBitmap>();
         OpenTK.Matrix4 ModelMatrix;
         OpenTK.Matrix4 ProjectionMatrix;
         System.Diagnostics.Stopwatch renderTimer;
@@ -1062,72 +1067,54 @@ namespace Radegast.Rendering
                         item.TextureData = Client.Assets.Cache.GetCachedAssetBytes(item.Data.TextureInfo.TextureID);
                     }
                     if (item.TextureData == null) { continue; }
+
+                    var mi = new ManagedImage(J2kImage.FromBytes(item.TextureData));
                     
-                    using (var reader = new OpenJpegDotNet.IO.Reader(item.TextureData))
+                    bool hasAlpha = false;
+                    bool fullAlpha = false;
+                    bool isMask = false;
+                    if ((mi.Channels & ManagedImage.ImageChannels.Alpha) != 0)
                     {
-                        if (!reader.ReadHeader()) { continue; }
-                        ManagedImage mi;
-                        try
-                        {
-                            mi = new ManagedImage(reader.DecodeToBitmap());
-                        }
-                        catch (NotSupportedException)
-                        {
-                            continue;
-                        }
-                        bool hasAlpha = false;
-                        bool fullAlpha = false;
-                        bool isMask = false;
-                        if ((mi.Channels & ManagedImage.ImageChannels.Alpha) != 0)
-                        {
-                            fullAlpha = true;
-                            isMask = true;
+                        fullAlpha = true;
+                        isMask = true;
 
-                            // Do we really have alpha, is it all full alpha, or is it a mask
-                            foreach (byte b in mi.Alpha)
+                        // Do we really have alpha, is it all full alpha, or is it a mask
+                        foreach (byte b in mi.Alpha)
+                        {
+                            if (b < 255)
                             {
-                                if (b < 255)
-                                {
-                                    hasAlpha = true;
-                                }
-                                if (b != 0)
-                                {
-                                    fullAlpha = false;
-                                }
-                                if (b != 0 && b != 255)
-                                {
-                                    isMask = false;
-                                }
+                                hasAlpha = true;
                             }
-
-                            if (!hasAlpha)
+                            if (b != 0)
                             {
-                                mi.ConvertChannels(mi.Channels & ~ManagedImage.ImageChannels.Alpha);
+                                fullAlpha = false;
+                            }
+                            if (b != 0 && b != 255)
+                            {
+                                isMask = false;
                             }
                         }
 
-                        item.Data.TextureInfo.HasAlpha = hasAlpha;
-                        item.Data.TextureInfo.FullAlpha = fullAlpha;
-                        item.Data.TextureInfo.IsMask = isMask;
-
-                        imageBytes = mi.ExportTGA();
-                        if (CacheDecodedTextures)
+                        if (!hasAlpha)
                         {
-                            RHelp.SaveCachedImage(imageBytes, item.TeFace.TextureID, hasAlpha, fullAlpha, isMask);
+                            mi.ConvertChannels(mi.Channels & ~ManagedImage.ImageChannels.Alpha);
                         }
+                    }
+
+                    item.Data.TextureInfo.HasAlpha = hasAlpha;
+                    item.Data.TextureInfo.FullAlpha = fullAlpha;
+                    item.Data.TextureInfo.IsMask = isMask;
+
+                    imageBytes = Targa.Encode(mi);
+                    if (CacheDecodedTextures)
+                    {
+                        RHelp.SaveCachedImage(imageBytes, item.TeFace.TextureID, hasAlpha, fullAlpha, isMask);
                     }
                 }
 
                 if (imageBytes != null)
                 {
-                    Image img;
-
-                    using (MemoryStream byteData = new MemoryStream(imageBytes))
-                    {
-                        img = LoadTGAClass.LoadTGA(byteData);
-                    }
-
-                    Bitmap bitmap = (Bitmap)img;
+                    var bitmap = Targa.Decode(new MemoryStream(imageBytes)).ToBitmap();
 
                     bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
 
@@ -1668,7 +1655,14 @@ namespace Radegast.Rendering
                 BinBVHAnimationReader bvh;
                 if (skeleton.mAnimationCache.TryGetValue(anim.AnimationID, out bvh))
                 {
-                    skeleton.addanimation(null, tid, bvh, anim.AnimationID);
+                    try
+                    {
+                        skeleton.addanimation(null, tid, bvh, anim.AnimationID);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log($"Failure in skel.addanimation: {ex.Message}", Helpers.LogLevel.Error);
+                    }
                     continue;
                 }
 
@@ -2813,7 +2807,7 @@ namespace Radegast.Rendering
                 {
                     if (prim.Sculpt.Type != SculptType.Mesh)
                     { // Regular sculptie
-                        Image img = null;
+                        SKBitmap img = null;
 
                         lock (sculptCache)
                         {
@@ -2827,7 +2821,7 @@ namespace Radegast.Rendering
                         {
                             if (LoadTexture(prim.Sculpt.SculptTexture, ref img, true))
                             {
-                                sculptCache[prim.Sculpt.SculptTexture] = (Bitmap)img;
+                                sculptCache[prim.Sculpt.SculptTexture] = img;
                             }
                             else
                             {
@@ -2835,7 +2829,7 @@ namespace Radegast.Rendering
                             }
                         }
 
-                        mesh = renderer.GenerateFacetedSculptMesh(prim, (Bitmap)img, RenderSettings.SculptRenderDetail);
+                        mesh = renderer.GenerateFacetedSculptMesh(prim, img, RenderSettings.SculptRenderDetail);
                     }
                     else
                     { // Mesh
@@ -2913,10 +2907,10 @@ namespace Radegast.Rendering
             }
         }
 
-        private bool LoadTexture(UUID textureID, ref Image texture, bool removeAlpha)
+        private bool LoadTexture(UUID textureID, ref SKBitmap texture, bool removeAlpha)
         {
             ManualResetEvent gotImage = new ManualResetEvent(false);
-            Image img = null;
+            SKBitmap img = null;
 
             try
             {
@@ -2925,7 +2919,7 @@ namespace Radegast.Rendering
                 byte[] tgaData;
                 if (RHelp.LoadCachedImage(textureID, out tgaData, out hasAlpha, out fullAlpha, out isMask))
                 {
-                    img = LoadTGAClass.LoadTGA(new MemoryStream(tgaData));
+                    img = Targa.Decode(new MemoryStream(tgaData));
                 }
                 else
                 {
@@ -2933,40 +2927,31 @@ namespace Radegast.Rendering
                         {
                             if (state == TextureRequestState.Finished)
                             {
-                                using (var reader = new OpenJpegDotNet.IO.Reader(assetTexture.AssetData))
+                                var mi = new ManagedImage(J2kImage.FromBytes(assetTexture.AssetData));
+                                if (removeAlpha)
                                 {
-                                    if (reader.ReadHeader())
+                                    if ((mi.Channels & ManagedImage.ImageChannels.Alpha) != 0)
                                     {
-                                        try {
-                                            ManagedImage mi = new ManagedImage(reader.DecodeToBitmap());
-                                            if (removeAlpha)
-                                            {
-                                                if ((mi.Channels & ManagedImage.ImageChannels.Alpha) != 0)
-                                                {
-                                                    mi.ConvertChannels(mi.Channels & ~ManagedImage.ImageChannels.Alpha);
-                                                }
-                                            }
-                                            tgaData = mi.ExportTGA();
-                                            img = LoadTGAClass.LoadTGA(new MemoryStream(tgaData));
-                                            RHelp.SaveCachedImage(tgaData, textureID, (mi.Channels & ManagedImage.ImageChannels.Alpha) != 0, false, false);
-                                        } catch (NotSupportedException) {
-                                            Logger.Log("Failed to decode texture " + assetTexture.AssetID, Helpers.LogLevel.Warning, instance.Client);
-                                        }
+                                        mi.ConvertChannels(mi.Channels & ~ManagedImage.ImageChannels.Alpha);
                                     }
                                 }
-                                
+
+                                // This is GROSS.
+                                tgaData = Targa.Encode(mi);
+                                img = Targa.Decode(new MemoryStream(tgaData));
+                                RHelp.SaveCachedImage(tgaData, textureID,
+                                    (mi.Channels & ManagedImage.ImageChannels.Alpha) != 0, false, false);
                             }
+
                             gotImage.Set();
                         }
                     );
                     gotImage.WaitOne(30 * 1000, false);
                 }
-                if (img != null)
-                {
-                    texture = img;
-                    return true;
-                }
-                return false;
+
+                if (img == null) { return false; }
+                texture = img;
+                return true;
             }
             catch (Exception e)
             {

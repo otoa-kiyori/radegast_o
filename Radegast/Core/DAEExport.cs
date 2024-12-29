@@ -25,8 +25,11 @@ using System.Xml;
 using System.IO;
 using System.Drawing;
 using System.Threading;
+using CoreJ2K;
 using OpenMetaverse;
 using OpenMetaverse.Rendering;
+using SkiaSharp;
+using SkiaSharp.Views.Desktop;
 
 namespace Radegast
 {
@@ -236,17 +239,7 @@ namespace Radegast
                         if (state == TextureRequestState.Finished && asset != null)
                         {
                             jpegData = asset.AssetData;
-                            using (var reader = new OpenJpegDotNet.IO.Reader(jpegData))
-                            {
-                                if (reader.ReadHeader())
-                                {
-                                    wImage = reader.DecodeToBitmap();
-                                }
-                                else
-                                {
-                                    throw new Exception("Cannot read J2K header");
-                                }
-                            }
+                            wImage = J2kImage.FromBytes(jpegData).As<SKBitmap>().ToBitmap();
                             gotImage.Set();
                         }
                         else if (state != TextureRequestState.Pending && state != TextureRequestState.Started && state != TextureRequestState.Progress)
@@ -370,10 +363,10 @@ namespace Radegast
             }
             else if (prim.Sculpt.Type != SculptType.Mesh)
             {
-                Image img = null;
+                SKBitmap img = null;
                 if (LoadTexture(prim.Sculpt.SculptTexture, ref img, true))
                 {
-                    mesh = Mesher.GenerateFacetedSculptMesh(prim, (Bitmap)img, DetailLevel.Highest);
+                    mesh = Mesher.GenerateFacetedSculptMesh(prim, img, DetailLevel.Highest);
                 }
             }
             else
@@ -394,10 +387,10 @@ namespace Radegast
             return mesh;
         }
 
-        bool LoadTexture(UUID textureID, ref Image texture, bool removeAlpha)
+        bool LoadTexture(UUID textureID, ref SKBitmap texture, bool removeAlpha)
         {
             var gotImage = new System.Threading.ManualResetEvent(false);
-            Image img = null;
+            SKBitmap img = null;
 
             try
             {
@@ -406,13 +399,7 @@ namespace Radegast
                 {
                     if (state == TextureRequestState.Finished)
                     {
-                        using (var reader = new OpenJpegDotNet.IO.Reader(assetTexture.AssetData))
-                        {
-                            if (reader.ReadHeader())
-                            {
-                                img = reader.Decode().ToBitmap(!removeAlpha);
-                            }
-                        }   
+                        img = J2kImage.FromBytes(assetTexture.AssetData).As<SKBitmap>();
                     }
                     gotImage.Set();
                 });
