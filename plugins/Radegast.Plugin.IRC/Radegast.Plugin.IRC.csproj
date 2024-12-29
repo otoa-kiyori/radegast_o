@@ -3,7 +3,7 @@
     <TargetFramework>net48</TargetFramework>
 	<UseWindowsForms>true</UseWindowsForms>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-	<Platforms>AnyCPU;x64;x86</Platforms>
+	<Platforms>AnyCPU</Platforms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugType>full</DebugType>

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-	<Platforms>AnyCPU;x64;x86</Platforms>
+	<Platforms>AnyCPU</Platforms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugType>full</DebugType>
@@ -60,6 +60,7 @@
     <Reference Include="System.Speech" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\libremetaverse\LibreMetaverse.Voice.Vivox\LibreMetaverse.Voice.Vivox.csproj" />
     <ProjectReference Include="..\..\..\Radegast\Radegast.csproj" />
     <ProjectReference Include="..\RadSpeech\Radegast.Plugin.Speech.csproj" />
   </ItemGroup>
