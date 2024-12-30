@@ -19,6 +19,7 @@
  */
 
 using System;
+using System.Threading;
 using System.Windows.Forms;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
@@ -116,11 +117,11 @@ namespace Radegast
             txtParcelDescription.Text = parcel.Description;
         }
 
-        void Grid_RegionHandleReply(object sender, RegionHandleReplyEventArgs e)
+        async void Grid_RegionHandleReply(object sender, RegionHandleReplyEventArgs e)
         {
             if (decodedLandmark == null || decodedLandmark.RegionID != e.RegionID) return;
 
-            parcelID = client.Parcels.RequestRemoteParcelID(decodedLandmark.Position, e.RegionHandle, e.RegionID);
+            parcelID = await client.Parcels.RequestRemoteParcelIDAsync(decodedLandmark.Position, e.RegionHandle, e.RegionID, CancellationToken.None);
             if (parcelID != UUID.Zero)
             {
                 client.Parcels.RequestParcelInfo(parcelID);
