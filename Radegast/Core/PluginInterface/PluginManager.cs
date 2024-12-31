@@ -40,15 +40,21 @@ namespace Radegast
         {
             "AIMLbot.dll",
             "Binaron.Serializer.dll",
+            "BouncyCastle.Crypto.dll",
             "C5.dll",
             "CommandLine.dll",
+            "CoreJ2K.dll",
+            "CoreJ2K.Skia.dll",
             "DbgHelp.dll",
             "fmod.dll",
             "IKVM.dll",
+            "libSkiaSharp.dll",
             "log4net.dll",
             "Meebey.SmartIrc4net.dll",
             "Monobjc.Cocoa.dll",
             "Monobjc.dll",
+            "NetSparkleUpdater.UI.WinForms.dll",
+            "Newtonsoft.Json.dll",
             "NSec.Cryptography.dll",
             "nvdacontrollerClient32.dll",
             "nvdacontrollerClient64.dll",
@@ -58,6 +64,7 @@ namespace Radegast
             "OpenTK",
             "OpenTK.GLControl.dll",
             "ortp.dll",
+            "Pfim.dll",
             "PrimMesher.dll",
             "protobuf-net.dll",
             "RadSpeechLin.dll",
@@ -75,6 +82,8 @@ namespace Radegast
             // Blacklist all of these
             "OpenMetaverse.",
             "LibreMetaverse.",
+            "Microsoft.",
+            "SkiaSharp.",
             "System.",
         });
 
