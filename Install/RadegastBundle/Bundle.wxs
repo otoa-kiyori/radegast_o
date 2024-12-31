@@ -1,29 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
     <?include BuildProperties.wxi?>
     <?define productVersion="!(bind.packageVersion.RadegastSetup)"?>
 
-	<?if $(var.Platform)=x64 ?>
-	    <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
-	<?else ?>
-	    <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
-	<?endif ?>
+	<?define PlatformProgramFilesFolder = "ProgramFiles6432Folder" ?>
 
-	<Bundle Name="$(var.productName)" 
-			Version="$(var.productVersion)" 
-            Manufacturer="$(var.companyName)"
-			AboutUrl="$(var.aboutUrl)"
-			HelpUrl="$(var.aboutUrl)"
-			UpdateUrl="$(var.aboutUrl)"
-			Copyright="$(var.copyright)"
-			IconSourceFile="..\..\Radegast\radegast.ico"
-			UpgradeCode="cccc26b5-aa17-47d8-8d5d-707a78ec9a10">
-        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
-            <bal:WixStandardBootstrapperApplication LicenseFile="assets\license.rtf" ShowVersion="yes" />
-        </BootstrapperApplicationRef>
-        <Variable Name="InstallFolder" Type="string" Value="[$(var.PlatformProgramFilesFolder)]$(var.productName)" Persisted="yes" />
+	<Bundle Name="$(var.productName)"
+          Version="$(var.productVersion)"
+          Manufacturer="$(var.companyName)"
+          AboutUrl="$(var.aboutUrl)"
+          HelpUrl="$(var.aboutUrl)"
+          UpdateUrl="$(var.aboutUrl)"
+          Copyright="$(var.copyright)"
+          IconSourceFile="..\..\Radegast\radegast.ico"
+          UpgradeCode="cccc26b5-aa17-47d8-8d5d-707a78ec9a10">
+        <BootstrapperApplication>
+            <bal:WixStandardBootstrapperApplication LicenseFile="assets\license.rtf" ShowVersion="yes" Theme="rtfLicense" />
+        </BootstrapperApplication>
+        <Variable Name="InstallFolder" Type="formatted" Value="[$(var.PlatformProgramFilesFolder)]$(var.productName)" Persisted="yes" />
         <Chain>
-			<PackageGroupRef Id="NetFx48Redist"/>
+			<PackageGroupRef Id="NetFx48Redist" />
             <MsiPackage Id="RadegastSetup" SourceFile="$(var.RadegastSetup.TargetPath)" Vital="yes" After="NetFx48Redist">
                 <MsiProperty Name="APPLICATIONFOLDER" Value="[InstallFolder]" />
             </MsiPackage>

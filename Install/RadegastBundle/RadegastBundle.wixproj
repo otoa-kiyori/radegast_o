@@ -1,17 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="WixToolset.Sdk/5.0.2">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-	<ProductVersion Condition=" '$(ProductVersion)' == '' ">3.1.0</ProductVersion>
-    <ProjectGuid>cccc26b5-aa17-47d8-8d5d-707a78ec9a10</ProjectGuid>
-    <SchemaVersion>2.0</SchemaVersion>
+    <ProductVersion Condition=" '$(ProductVersion)' == '' ">3.1.0</ProductVersion>
     <OutputName>RadegastBundle_$(Platform)</OutputName>
     <OutputType>Bundle</OutputType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <InstallerPlatform>x86</InstallerPlatform>
     <SignCabs>true</SignCabs>
     <SignOutput>true</SignOutput>
@@ -25,7 +20,6 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <InstallerPlatform>x64</InstallerPlatform>
     <SignCabs>true</SignCabs>
     <SignOutput>true</SignOutput>
@@ -38,22 +32,9 @@
     <SignOutput>true</SignOutput>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Bundle.wxs" />
-    <Compile Include="NetFx48.wxs" />
-  </ItemGroup>
-  <ItemGroup>
-    <WixExtension Include="WixUtilExtension">
-      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
-      <Name>WixUtilExtension</Name>
-    </WixExtension>
-    <WixExtension Include="WixNetFxExtension">
-      <HintPath>$(WixExtDir)\WixNetFxExtension.dll</HintPath>
-      <Name>WixNetFxExtension</Name>
-    </WixExtension>
-    <WixExtension Include="WixBalExtension">
-      <HintPath>$(WixExtDir)\WixBalExtension.dll</HintPath>
-      <Name>WixBalExtension</Name>
-    </WixExtension>
+    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.NetFx.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.Bal.wixext" Version="5.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RadegastSetup\RadegastSetup.wixproj">
@@ -73,11 +54,6 @@
   <ItemGroup>
     <Folder Include="assets" />
   </ItemGroup>
-  <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />
-  <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
-    <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
-  </Target>
   <Target Name="FindSignTool">
     <PropertyGroup>
       <WindowsKitsRoot>$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Kits\Installed Roots', 'KitsRoot10', null, RegistryView.Registry32, RegistryView.Default))</WindowsKitsRoot>
@@ -93,10 +69,11 @@
       <SignToolPath Condition="'$(SignToolPath)' == '' And '$(SignToolPathBase)' != ''">$(SignToolPathBase)$(Platform)\</SignToolPath>
     </PropertyGroup>
   </Target>
+  <!--
   <Target Name="SignBundleEngine" DependsOnTargets="FindSignTool">
     <Exec Command="&quot;$(SignToolPath)signtool.exe&quot; sign /fd SHA256 /sm /sha1 688eef6260f0fff81e1d46e2605c8039833a92bb /t http://timestamp.comodoca.com/authenticode &quot;@(SignBundleEngine)&quot;" />
   </Target>
   <Target Name="SignBundle" DependsOnTargets="FindSignTool">
     <Exec Command="&quot;$(SignToolPath)signtool.exe&quot; sign /fd SHA256 /sm /sha1 688eef6260f0fff81e1d46e2605c8039833a92bb /t http://timestamp.comodoca.com/authenticode &quot;@(SignBundle)&quot;" />
-  </Target>
+  </Target>-->
 </Project>
