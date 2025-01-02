@@ -1,33 +1,9 @@
 ﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-    <Fragment>
-        <ComponentGroup Id="VoicePackComponentGroup">
-            <Component Id="SLVoice.exe" Directory="INSTALLFOLDER">
-                <File Id="SLVoice.exe" Source="slvoice\SLVoice.exe" KeyPath="yes" Checksum="yes" />
-            </Component>
-            <Component Id="DbgHelp.dll" Directory="INSTALLFOLDER">
-                <File Id="DbgHelp.dll" Source="slvoice\DbgHelp.dll" KeyPath="yes" />
-            </Component>
-            <Component Id="ortp.dll" Directory="INSTALLFOLDER">
-                <File Id="ortp.dll" Source="slvoice\ortp.dll" KeyPath="yes" />
-            </Component>
-            <Component Id="ortp.pdb" Directory="INSTALLFOLDER">
-                <File Id="ortp.pdb" Source="slvoice\ortp.pdb" />
-            </Component>
-            <Component Id="vivoxsdk.dll" Directory="INSTALLFOLDER">
-                <File Id="vivoxsdk.dll" Source="slvoice\vivoxsdk.dll" KeyPath="yes" />
-            </Component>
-            <Component Id="vivoxsdk.lib" Directory="INSTALLFOLDER">
-                <File Id="vivoxsdk.lib" Source="slvoice\vivoxsdk.lib" KeyPath="yes" />
-            </Component>
-            <Component Id="vivoxsdk.pdb" Directory="INSTALLFOLDER">
-                <File Id="vivoxsdk.pdb" Source="slvoice\vivoxsdk.pdb" />
-            </Component>
-            <Component Id="zlib1.dll" Directory="INSTALLFOLDER">
-                <File Id="zlib1.dll" Source="slvoice\zlib1.dll" KeyPath="yes" />
-            </Component>
-            <Component Id="vivox_licenses.txt" Directory="INSTALLFOLDER">
-                <File Id="vivox_licenses.txt" Source="slvoice\vivox_licenses.txt" />
-            </Component>
-        </ComponentGroup>
-    </Fragment>
+  <Fragment>
+    <ComponentGroup Id="VoicePackComponentGroup" Directory="INSTALLFOLDER">
+      <Files Include="slvoice\*.dll" />
+      <File Id="SLVoice" Source="slvoice\SLVoice.exe" KeyPath="yes" Checksum="yes" />
+      <File Id="VivoxLicense" Source="slvoice\vivox_licenses.txt" />
+    </ComponentGroup>
+  </Fragment>
 </Wix>

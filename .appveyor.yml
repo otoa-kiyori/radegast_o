@@ -14,6 +14,10 @@ environment:
     platform: x86
     appveyor_build_worker_image: Visual Studio 2022
     configuration: ReleaseWindows
+  - job_name: Windows ARM64 Build
+    platform: ARM64
+    appveyor_build_worker_image: Visual Studio 2022
+    configuration: ReleaseWindows
 
   BugsplatDatabase: sjofnllc
   PfxDownloadUrl:
@@ -52,8 +56,8 @@ before_build:
 after_build:
   - ps: New-Item -ItemType directory -Path .\$env:PLATFORM
   - cmd: '7z a -ttar -so Radegast-%TAG_VERSION%.tar %APPVEYOR_BUILD_FOLDER%\bin\Release\ | 7z a -si Radegast_%PLATFORM%-%TAG_VERSION%.tbz'
-  - ps: Copy-Item bin\Release\RadegastSetup_$env:PLATFORM.msi RadegastSetup_$env:PLATFORM-$env:TAG_VERSION.msi
-  - ps: Copy-Item bin\Release\RadegastBundle_$env:PLATFORM.exe RadegastSetup_$env:PLATFORM-$env:TAG_VERSION.exe
+  - ps: Copy-Item bin\Packages\en-US\RadegastSetup_$env:PLATFORM.msi RadegastSetup_$env:PLATFORM-$env:TAG_VERSION.msi
+  - ps: Copy-Item bin\Packages\RadegastBundle_$env:PLATFORM.exe RadegastSetup_$env:PLATFORM-$env:TAG_VERSION.exe
 
 artifacts:
   - path: 'RadegastSetup*.exe'

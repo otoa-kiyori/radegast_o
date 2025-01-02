@@ -1,42 +1,10 @@
-﻿<Project>
-  <Import Project="Sdk.props" Sdk="WixToolset.Sdk" Version="5.0.2" />
+﻿<Project Sdk="WixToolset.Sdk/5.0.2">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <ProductVersion Condition=" '$(ProductVersion)' == '' ">3.1.0</ProductVersion>
     <OutputName>RadegastSetup_$(Platform)</OutputName>
+    <OutputPath>..\..\bin\Packages\</OutputPath>
     <Name>RadegastSetup</Name>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
-    <InstallerPlatform>x86</InstallerPlatform>
-    <SignCabs>true</SignCabs>
-    <SignOutput>true</SignOutput>
-    <SuppressIces>ICE99</SuppressIces>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseWindows|x86' ">
-    <OutputPath>..\..\bin\Release\</OutputPath>
-    <IntermediateOutputPath>obj\Release\</IntermediateOutputPath>
-    <InstallerPlatform>x86</InstallerPlatform>
-    <SignCabs>true</SignCabs>
-    <SignOutput>true</SignOutput>
-    <SuppressValidation>False</SuppressValidation>
-    <SuppressIces>ICE99</SuppressIces>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
-    <InstallerPlatform>x64</InstallerPlatform>
-    <SignCabs>true</SignCabs>
-    <SignOutput>true</SignOutput>
-    <SuppressIces>ICE99</SuppressIces>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseWindows|x64' ">
-    <OutputPath>..\..\bin\Release\</OutputPath>
-    <IntermediateOutputPath>obj\Release\</IntermediateOutputPath>
-    <InstallerPlatform>x64</InstallerPlatform>
-    <SignCabs>true</SignCabs>
-    <SignOutput>true</SignOutput>
-    <SuppressValidation>False</SuppressValidation>
-    <SuppressIces>ICE99</SuppressIces>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="WixToolset.NetFx.wixext" Version="5.0.2" />
@@ -45,33 +13,29 @@
     <PackageReference Include="WixToolset.Heat" Version="5.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="assets\license.rtf" />
-    <Content Include="assets\radegast.ico" />
-    <Content Include="BuildProperties.wxi" />
-    <Content Include="slvoice\DbgHelp.dll" />
-    <Content Include="slvoice\ortp.dll" />
-    <Content Include="slvoice\ortp.pdb" />
-    <Content Include="slvoice\SLVoice.exe" />
-    <Content Include="slvoice\vivoxsdk.dll" />
-    <Content Include="slvoice\vivoxsdk.lib" />
-    <Content Include="slvoice\vivoxsdk.pdb" />
-    <Content Include="slvoice\vivox_licenses.txt" />
-    <Content Include="slvoice\zlib1.dll" />
-    <Content Include="UI.wxi" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Radegast\Radegast.csproj">
-      <Name>Radegast</Name>
-      <Project>{f02f3c44-dcfc-964f-0516-85f7f141ccdd}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="assets" />
+    <Folder Include="vcredist" />
     <Folder Include="slvoice" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\BuildProperties.wxi" />
+    <None Include="..\..\LICENSE.rtf" />
+    <Content Include="slvoice\README.txt" />
+    <Content Include="slvoice\vivox_licenses.txt" />
+    <Content Include="slvoice\vivox_sdk_license.txt" />
+    <Content Include="UI.wxi" />
+    <None Include="slvoice\DbgHelp.dll" />
+    <None Include="slvoice\ortp.dll" />
+    <None Include="slvoice\ortp.pdb" />
+    <None Include="slvoice\SLVoice.exe" />
+    <None Include="slvoice\vivoxsdk.dll" />
+    <None Include="slvoice\vivoxsdk.lib" />
+    <None Include="slvoice\vivoxsdk.pdb" />
+    <None Include="slvoice\zlib1.dll" />
+    <None Include="vcredist\Microsoft_VC120_CRT_x86.msm" />
+    <None Include="vcredist\Microsoft_VC140_CRT_x86.msm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Radegast\Radegast.csproj" DoNotHarvest="True" />
   </ItemGroup>
   <Target Name="FindSignTool">
     <PropertyGroup>
@@ -88,26 +52,10 @@
       <SignToolPath Condition="'$(SignToolPath)' == '' And '$(SignToolPathBase)' != ''">$(SignToolPathBase)$(Platform)\</SignToolPath>
     </PropertyGroup>
   </Target>
-  <!--
   <Target Name="SignCabs" DependsOnTargets="FindSignTool">
     <Exec Command="&quot;$(SignToolPath)signtool.exe&quot; sign /fd SHA256 /sm /sha1 688eef6260f0fff81e1d46e2605c8039833a92bb /t http://timestamp.comodoca.com/authenticode &quot;%(SignCabs.FullPath)&quot;" />
   </Target>
   <Target Name="SignMsi" DependsOnTargets="FindSignTool">
     <Exec Command="&quot;$(SignToolPath)signtool.exe&quot; sign /fd SHA256 /sm /sha1 688eef6260f0fff81e1d46e2605c8039833a92bb /t http://timestamp.comodoca.com/authenticode &quot;%(SignMsi.FullPath)&quot;" />
-  </Target> -->
-  <Import Project="Sdk.targets" Sdk="WixToolset.Sdk" Version="5.0.2" />
-  <Target Name="BeforeBuild">
-    <HeatDirectory OutputFile="$(ProjectDir)\ProductInstallFiles.wxs"
-                   Directory="..\..\bin\Release\"
-                   ComponentGroupName="ProductFilesComponentGroup"
-                   DirectoryRefId="INSTALLFOLDER"
-                   AutogenerateGuids="true"
-                   PreprocessorVariable="var.Radegast.TargetDir"
-                   SuppressRegistry="true"
-                   SuppressRootDirectory="true"
-                   SuppressUniqueIds="true"
-                   ToolPath="$(WixToolPath)"
-                   NoLogo="true"
-                   VerboseOutput="true" />
   </Target>
 </Project>
