@@ -1,6 +1,6 @@
 ﻿/**
  * Radegast Metaverse Client
- * Copyright(c) 2021, Sjofn, LLC
+ * Copyright(c) 2021-2024, Sjofn, LLC
  * All rights reserved.
  *  
  * Radegast is free software: you can redistribute it and/or modify
@@ -43,9 +43,11 @@ namespace Radegast.Core
             new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
                 {
                     {"x86", 4},
+                    {"ARM", 4},
                     {"AMD64", 8},
                     {"IA64", 8},
-                    {"ARM", 4}
+                    {"ARM64", 8}
+                    
                 };
 
         private readonly Dictionary<string, string> _ProcessorArchitecturePlatforms = 
@@ -54,7 +56,8 @@ namespace Radegast.Core
                     {"x86", "x86"},
                     {"AMD64", "x64"},
                     {"IA64", "Itanium"},
-                    {"ARM", "WinCE"}
+                    {"ARM", "WinCE"},
+                    {"ARM64", "ARM64"}
                 };
 
         private readonly object _SyncLock = new object();

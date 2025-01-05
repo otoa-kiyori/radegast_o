@@ -1,0 +1,32 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <?include ..\BuildProperties.wxi?>
+  <Fragment>
+    <ComponentGroup Id="Radegast.Components" Directory="INSTALLFOLDER">
+      <Files Include="$(var.Radegast.TargetDir)**">
+        <Exclude Files="$(var.Radegast.TargetDir)**\*.pdb"/>
+        <Exclude Files="$(var.Radegast.TargetDir)Radegast.exe"/>
+      </Files>
+      <Component>
+        <File Id="Radegast.Executable" Source="$(var.Radegast.TargetDir)Radegast.exe" />
+      </Component>
+    </ComponentGroup>
+    <!-- Start menu -->
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcut">
+        <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="$(var.productName)"
+                  Description="$(var.productDesc)"
+                  Icon="Radegast.ico"
+                  Target="[INSTALLFOLDER]Radegast.exe"
+                  WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
+        <RegistryValue Root="HKCU"
+                       Key="Software\$(var.companyName)\$(var.productName)"
+                       Name="installed"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+</Wix>
