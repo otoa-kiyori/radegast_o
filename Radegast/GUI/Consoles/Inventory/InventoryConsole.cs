@@ -27,7 +27,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Threading;
 using System.Threading.Tasks;
-
+using CommandLine;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using Radegast.Core;
@@ -702,9 +702,9 @@ namespace Radegast
 
                 void FolderUpdatedCB(object sender, FolderUpdatedEventArgs ea)
                 {
-                    if (f.UUID != ea.FolderID) return;
-                    if (((InventoryFolder) Inventory.Items[ea.FolderID].Data).DescendentCount >
-                        Inventory.Items[ea.FolderID].Nodes.Count) return;
+                    if (f.UUID != ea.FolderID) { return; }
+                    if (((InventoryFolder) Inventory[ea.FolderID]).DescendentCount >
+                        Inventory.GetNodeFor(ea.FolderID).Nodes.Count) { return; }
 
                     success = true;
                     gotFolderEvent.Set();
@@ -718,7 +718,7 @@ namespace Radegast
                 if (!success)
                 {
                     Logger.Log(
-                        $"Failed fetching folder {f.Name}, got {Inventory.Items[f.UUID].Nodes.Count} items out of {((InventoryFolder) Inventory.Items[f.UUID].Data).DescendentCount}",
+                        $"Failed fetching folder {f.Name}, got {Inventory.GetNodeFor(f.UUID).Nodes.Count} items out of {Inventory[f.UUID].Cast<InventoryFolder>().DescendentCount}",
                         Helpers.LogLevel.Error, Client);
                 }
             }
@@ -761,7 +761,7 @@ namespace Radegast
             {
                 FolderFetchRetries.Clear();
             }
-
+            GestureManager.Instance.BeginMonitoring();
             do
             {
                 lock (QueuedFolders)
@@ -837,7 +837,6 @@ namespace Radegast
             }
 
             Logger.Log("Finished updating inventory folders, saving cache...", Helpers.LogLevel.Debug, Client);
-            GestureManager.Instance.BeginMonitoring();
 
             ThreadPool.QueueUserWorkItem(state => Inventory.SaveToDisk(instance.InventoryCacheFileName));
 
@@ -861,7 +860,7 @@ namespace Radegast
 
             saveAllTToolStripMenuItem.Enabled = false;
 
-            Inventory.Items = new Dictionary<UUID, InventoryNode>();
+            Inventory.Clear();
             Inventory.RootFolder = Inventory.RootFolder;
 
             invTree.Nodes.Clear();
@@ -2425,8 +2424,8 @@ namespace Radegast
 
         void PerformRecursiveSearch(int level, UUID folderID)
         {
-            var me = Inventory.Items[folderID].Data;
-            searchRes.Add(new SearchResult(me, level));
+            var folder = Inventory[folderID];
+            searchRes.Add(new SearchResult(folder, level));
             var sorted = Inventory.GetContents(folderID);
 
             sorted.Sort((b1, b2) =>
@@ -2492,7 +2491,7 @@ namespace Radegast
                 }
             }
 
-            if (searchRes[searchRes.Count - 1].Inv.Equals(me))
+            if (searchRes[searchRes.Count - 1].Inv.Equals(folder))
             {
                 searchRes.RemoveAt(searchRes.Count - 1);
             }
@@ -2523,7 +2522,7 @@ namespace Radegast
                 emptyItem = new ListViewItem(string.Empty);
             }
 
-            searchRes = new List<SearchResult>(Inventory.Items.Count);
+            searchRes = new List<SearchResult>(Inventory.Count);
             searchItemCache.Clear();
             PerformRecursiveSearch(0, Inventory.RootFolder.UUID);
             lstInventorySearch.VirtualListSize = searchRes.Count;
@@ -2532,9 +2531,9 @@ namespace Radegast
 
         private void lstInventorySearch_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
         {
-            if (searchItemCache.ContainsKey(e.ItemIndex))
+            if (searchItemCache.TryGetValue(e.ItemIndex, out var value))
             {
-                e.Item = searchItemCache[e.ItemIndex];
+                e.Item = value;
             }
             else if (e.ItemIndex < searchRes.Count)
             {

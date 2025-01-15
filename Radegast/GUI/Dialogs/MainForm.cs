@@ -1629,8 +1629,7 @@ namespace Radegast
             {
                 UIFactory = new NetSparkleUpdater.UI.WinForms.UIFactory(icon),
                 RelaunchAfterUpdate = true,
-                UseNotificationToast = true,
-                SecurityProtocolType = System.Net.SecurityProtocolType.Tls12
+                UseNotificationToast = true
             };
             SparkleUpdater.StartLoop(true);
         }
