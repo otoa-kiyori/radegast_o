@@ -247,7 +247,7 @@ namespace Radegast
                         }
 
                         uploadDone.Set();
-                    }));
+                    }), CancellationToken.None);
 
                     if (!uploadDone.WaitOne(4 * 60 * 1000))
                     {

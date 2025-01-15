@@ -141,22 +141,12 @@ namespace Radegast
                     lock (Content) Content.Clear();
 
 
-                    List<UUID> items = new List<UUID>();
-                    List<UUID> owners = new List<UUID>();
-
-                    foreach (var link in ContentLinks())
-                    {
-                        //if (Client.Inventory.Store.Contains(link.AssetUUID))
-                        //{
-                        //    continue;
-                        //}
-                        items.Add(link.AssetUUID);
-                        owners.Add(Client.Self.AgentID);
-                    }
+                    var items = ContentLinks().ToDictionary(
+                        link => link.AssetUUID, link => Client.Self.AgentID);
 
                     if (items.Count > 0)
                     {
-                        Client.Inventory.RequestFetchInventory(items, owners);
+                        Client.Inventory.RequestFetchInventory(items);
                     }
                 }
             }
@@ -219,7 +209,7 @@ namespace Radegast
         private void CreateCOF()
         {
             UUID cofID = Client.Inventory.CreateFolder(Client.Inventory.Store.RootFolder.UUID, "Current Outfit", FolderType.CurrentOutfit);
-            if (Client.Inventory.Store.Items.ContainsKey(cofID) && Client.Inventory.Store.Items[cofID].Data is InventoryFolder folder)
+            if (Client.Inventory.Store.Contains(cofID) && Client.Inventory.Store[cofID] is InventoryFolder folder)
             {
                 COF = folder;
                 COFReady = true;
