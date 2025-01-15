@@ -55,9 +55,9 @@
     <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.1" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="System.Speech" Version="9.0.0" />
+    <PackageReference Include="System.Speech" Version="9.0.1" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
   <ItemGroup>
