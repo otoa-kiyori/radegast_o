@@ -314,7 +314,7 @@ namespace Radegast
 
         void UpdateContentsList(List<InventoryBase> items)
         {
-            //object inventory in liste reinlesen
+            //object inventory in items List
             lstContents.Items.Clear();
             btnOpen.Enabled = false;
             Primitive prim = (Primitive)lstContents.Tag;
