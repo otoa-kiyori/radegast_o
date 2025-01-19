@@ -1,7 +1,7 @@
 ﻿/**
  * Radegast Metaverse Client
  * Copyright(c) 2009-2014, Radegast Development Team
- * Copyright(c) 2016-2022, Sjofn, LLC
+ * Copyright(c) 2016-2025, Sjofn, LLC
  * All rights reserved.
  *  
  * Radegast is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using OpenMetaverse;
 
 namespace Radegast
@@ -179,11 +180,6 @@ namespace Radegast
 
         #region Private methods
 
-        private void RequestDescendants(UUID folderID)
-        {
-            Client.Inventory.RequestFolderContents(folderID, Client.Self.AgentID, true, true, InventorySortOrder.ByDate);
-        }
-
         private void InitCOF()
         {
             var rootContent = Client.Inventory.Store.GetContents(Client.Inventory.Store.RootFolder.UUID);
@@ -202,13 +198,15 @@ namespace Radegast
             }
             else
             {
-                RequestDescendants(COF.UUID);
+                Task task = Client.Inventory.RequestFolderContents(COF.UUID, Client.Self.AgentID,
+                    true, true, InventorySortOrder.ByDate);
             }
         }
 
         private void CreateCOF()
         {
-            UUID cofID = Client.Inventory.CreateFolder(Client.Inventory.Store.RootFolder.UUID, "Current Outfit", FolderType.CurrentOutfit);
+            UUID cofID = Client.Inventory.CreateFolder(Client.Inventory.Store.RootFolder.UUID, 
+                "Current Outfit", FolderType.CurrentOutfit);
             if (Client.Inventory.Store.Contains(cofID) && Client.Inventory.Store[cofID] is InventoryFolder folder)
             {
                 COF = folder;
