@@ -512,7 +512,6 @@ namespace Radegast
                 {
                     parentNode.Nodes.RemoveByKey(f.UUID.ToString());
                 }
-                Logger.DebugLog($"== 4 '{dirNode.Text}' '{parentNode.Text}'");
                 parentNode.Nodes.Add(dirNode);
             }
             lock (UUID2NodeCache)
