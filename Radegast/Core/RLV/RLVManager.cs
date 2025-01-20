@@ -32,7 +32,7 @@ namespace Radegast
     public class RLVManager : IDisposable
     {
         #region Events
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<RLVEventArgs> m_RLVRuleChanged;
 
         /// <summary>Raises the RLVRuleChanged event</summary>
