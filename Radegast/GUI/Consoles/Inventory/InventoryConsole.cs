@@ -762,9 +762,9 @@ namespace Radegast
                 }
                 TraverseAndQueueNodes(Inventory.RootNode);
                 if (QueuedFolders.Count == 0) { break; }
-                Logger.DebugLog($"Queued {QueuedFolders.Count} folders for update");
+                //Logger.DebugLog($"Queued {QueuedFolders.Count} folders for update");
 
-                System.Threading.Tasks.Parallel.ForEach(QueuedFolders, folderID =>
+                Parallel.ForEach(QueuedFolders, folderID =>
                 {
                     bool success = false;
 
@@ -1054,7 +1054,7 @@ namespace Radegast
         private void invTree_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (!(invTree.SelectedNode.Tag is InventoryItem item)) { return; }
-            item = instance.COF.RealInventoryItem(item);
+            item = instance.COF.OriginalInventoryItem(item);
 
             switch (item.AssetType)
             {
@@ -1214,7 +1214,7 @@ namespace Radegast
             if (item.IsLink())
             {
                 raw += " (link)";
-                item = instance.COF.RealInventoryItem(item);
+                item = instance.COF.OriginalInventoryItem(item);
                 if (Inventory.Contains(item.AssetUUID) && Inventory[item.AssetUUID] is InventoryItem)
                 {
                     item = (InventoryItem)Inventory[item.AssetUUID];
@@ -1268,7 +1268,7 @@ namespace Radegast
                 invTree.SelectedNode = node;
                 if (node.Tag is InventoryItem tag)
                 {
-                    UpdateItemInfo(instance.COF.RealInventoryItem(tag));
+                    UpdateItemInfo(instance.COF.OriginalInventoryItem(tag));
                 }
                 else
                 {
@@ -1412,7 +1412,7 @@ namespace Radegast
                 else if (node.Tag is InventoryItem tag)
                 {
                     #region Item context menu
-                    InventoryItem item = instance.COF.RealInventoryItem(tag);
+                    InventoryItem item = instance.COF.OriginalInventoryItem(tag);
                     ctxInv.Items.Clear();
 
                     ToolStripMenuItem ctxItem;
@@ -1799,7 +1799,7 @@ namespace Radegast
                 // The rest operate on the item that is pointed by the link
                 if (cmd != "copy_item" && cmd != "cut_item" && cmd != "delete_item")
                 {
-                    item = instance.COF.RealInventoryItem(item);
+                    item = instance.COF.OriginalInventoryItem(item);
                 }
 
                 switch (cmd)

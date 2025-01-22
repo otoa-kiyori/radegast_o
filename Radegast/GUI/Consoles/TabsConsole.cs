@@ -277,7 +277,7 @@ namespace Radegast
                     ForceCloseTab("login");
                 }
 
-                client.Self.RetrieveInstantMessages();
+                _ = client.Self.RetrieveInstantMessages();
             }
         }
 
