@@ -357,7 +357,7 @@ namespace Radegast
             if (ContentLinks().Find(itemLink => itemLink.AssetUUID == item.UUID) == null)
             {
                 Client.Inventory.CreateLink(COF.UUID, item.UUID, item.Name, newDescription, 
-                    AssetType.Link, item.InventoryType, UUID.Random(), 
+                    item.InventoryType, UUID.Random(), 
                     (success, newItem) =>
                 {
                     if (success)
