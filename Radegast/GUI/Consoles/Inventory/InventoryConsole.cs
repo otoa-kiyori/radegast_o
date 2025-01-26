@@ -35,7 +35,6 @@ using Radegast.WinForms;
 
 namespace Radegast
 {
-
     public partial class InventoryConsole : UserControl
     {
         private const int UPDATE_INTERVAL = 1000;
@@ -2580,8 +2579,6 @@ namespace Radegast
             var c = new FolderCopy(instance);
             c.GetFolders("Initial Outfits");
         }
-
-
     }
 
     #region Sorter class

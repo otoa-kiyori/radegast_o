@@ -118,14 +118,6 @@ namespace Radegast
             {
                 InitialUpdate();
             }
-            lock (Content)
-            {
-                foreach (var lk in from link in Content.Values 
-                         where link.InventoryType == InventoryType.Wearable 
-                         select (InventoryWearable)link into w 
-                         select links.Find(l => l.AssetUUID == w.UUID))
-                { }
-            }
         }
 
         private readonly object FolderSync = new object();
