@@ -34,7 +34,6 @@ namespace Radegast
         private GridClient Client;
         private readonly RadegastInstance Instance;
         private bool InitializedCOF = false;
-        public Dictionary<UUID, InventoryItem> Content = new Dictionary<UUID, InventoryItem>();
         public InventoryFolder COF;
 
         #endregion Fields
@@ -80,7 +79,6 @@ namespace Radegast
             client.Inventory.ItemReceived -= Inventory_ItemReceived;
             client.Appearance.AppearanceSet -= Appearance_AppearanceSet;
             client.Objects.KillObject -= Objects_KillObject;
-            lock (Content) Content.Clear();
             InitializedCOF = false;
         }
 
@@ -91,16 +89,7 @@ namespace Radegast
 
         private void Inventory_ItemReceived(object sender, ItemReceivedEventArgs e)
         {
-            var links = ContentLinks();
-            bool partOfCOF = links.Any(cofItem => cofItem.AssetUUID == e.Item.UUID);
 
-            if (partOfCOF)
-            {
-                lock (Content)
-                {
-                    Content[e.Item.UUID] = e.Item;
-                }
-            }
         }
 
         private readonly object FolderSync = new object();
@@ -114,10 +103,11 @@ namespace Radegast
                 COF = (InventoryFolder)Client.Inventory.Store[COF.UUID];
                 lock (FolderSync)
                 {
-                    lock (Content) { Content.Clear(); }
-
-                    var items = ContentLinks().ToDictionary(
-                        link => link.AssetUUID, link => Client.Self.AgentID);
+                    var items = new Dictionary<UUID, UUID>();
+                    foreach (var link in ContentLinks().Where(link => !items.ContainsKey(link.AssetUUID)))
+                    {
+                        items.Add(link.AssetUUID, Client.Self.AgentID);
+                    }
 
                     if (items.Count > 0)
                     {
@@ -164,7 +154,7 @@ namespace Radegast
 
         private void InitializeCurrentOutfitFolder()
         {
-            COF = Client.Appearance.GetCurrentOutfitFolder();
+            COF = Client.Appearance.GetCurrentOutfitFolder(CancellationToken.None).Result;
 
             if (COF == null)
             {
@@ -195,7 +185,7 @@ namespace Radegast
         /// Return contents of COF
         /// </summary>
         /// <returns>List if InventoryItems that can be part of appearance (attachments, wearables)</returns>
-        public List<InventoryItem> ContentLinks()
+        private List<InventoryItem> ContentLinks()
         {
             var ret = new List<InventoryItem>();
             if (COF != null)
