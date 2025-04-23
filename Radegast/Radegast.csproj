@@ -6,6 +6,7 @@
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<UseWindowsForms>true</UseWindowsForms>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
 	<Platforms>AnyCPU;x64;x86;ARM64</Platforms>
 	<OutputPath>..\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
